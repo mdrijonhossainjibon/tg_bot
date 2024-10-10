@@ -22,14 +22,11 @@ import { handleReferralBonus, joinedChannel, Maintenance, Register } from 'contr
 import { generateUID,  getConfig, keyboard } from 'lib';
 import './callback_query';
 import { referralMap } from './callback_query';
-
-
-
+ 
 const userPreviousMessages: any = {};
-
-
+ 
 // Connect to MongoDB
-///mongodb://admin:password@127.0.0.1:27017/
+ 
 mongoose.connect(process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/admin').then(() => console.log('MongoDB connected')).catch((err: any) => console.error('MongoDB connection error:', err));
 
 const app = express();
