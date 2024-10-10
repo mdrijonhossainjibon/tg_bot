@@ -7,7 +7,7 @@
     "live": "nodemon",
     "watch-ts": "tsc -w",
     "build": "tsc",
-    "start:pm2": "pm2 start ecosystem.config.js",
+    "pm": "pm2 start ecosystem.config.js",
     "logs": "pm2 logs",
     "rm": "pm2 delete autopay"
   },
