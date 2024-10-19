@@ -4,6 +4,9 @@ import { getConfig, isUserInChannel, keyboard } from "lib";
 import { IUser, NOSQL } from "models";
 import TelegramBot, { InlineKeyboardButton, InlineKeyboardMarkup } from "node-telegram-bot-api";
 import qrcode from 'qrcode';
+
+
+
 export async function handleReferralBonus(referrerId: number) {
     const referrer = await NOSQL.User.findOne({ userId: referrerId });
     if (!referrer) return;
