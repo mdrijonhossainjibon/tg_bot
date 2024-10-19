@@ -413,7 +413,6 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
         return res.status(409).json({ success: false, message: 'User with this ID or username already exists.' });
       }
   
-      // Initialize variables
       let refUser = null;
   
       // Check for hash and start_param, and find reference user if both are provided
@@ -433,7 +432,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
         }
       }
-  
+   
       // Create new user
       try {
         const newUser = await NOSQL.User.create({
@@ -466,7 +465,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
       }
   
       // Find the user by userId
-      const user = await NOSQL.User.findOne({ _id : userId });
+      const user = await NOSQL.User.findOne({  userId });
   
       if (!user) {
         return res.status(404).json({ success: false, message: 'User not found.' });
