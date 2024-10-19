@@ -399,6 +399,8 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
     try {
       const { user, hash, start_param } = req.body;
   
+      console.log(req.body);
+      
       // Validate user input
       if (!user || !user.id || typeof user.id !== 'number') {
         return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
