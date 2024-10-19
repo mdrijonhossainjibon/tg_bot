@@ -419,7 +419,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
       if (hash && start_param) {
         try {
           refUser = await NOSQL.User.findOne({ 
-            $or: [{ _id: hash }, { uid: start_param }]
+            $or: [ { uid: start_param }]
           });
   
           if (!refUser) {
@@ -427,14 +427,14 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           }
   
           
+       await handleReferralBonus(user.id);
+   
         } catch (err) {
           console.error('Error finding reference user:', err);
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
         }
       }
 
-      await handleReferralBonus(user.id);
-   
       // Create new user
       try {
         const newUser = await NOSQL.User.create({
