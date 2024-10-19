@@ -19,9 +19,7 @@ export async function handleReferralBonus(referrerId: number) {
     await referrer.save();
 
     // Send a notification message to the referrer
-    const message = await bot.sendMessage(referrer.userId, `🎉 You have a new referral! You earned a bonus of ${bonus} USDT!`);
-
-    return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: referrer.userId }, { messageId: message.message_id }, { upsert: true, new: true });
+     await bot.sendMessage(referrer.userId, `🎉 You have a new referral! You earned a bonus of ${bonus} USDT!`);
 }
 
 

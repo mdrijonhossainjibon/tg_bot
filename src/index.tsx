@@ -427,8 +427,10 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           }
   
           
-       await handleReferralBonus(user.id);
-   
+          refUser.bonus = (refUser.bonus || 0) + 0.07;
+          refUser.referralCount = (refUser.referralCount || 0) + 1;
+          await refUser.save()
+          await bot.sendMessage(refUser.userId, `🎉 You have a new referral! You earned a bonus of 0.07 USDT!`);
         } catch (err) {
           console.error('Error finding reference user:', err);
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
