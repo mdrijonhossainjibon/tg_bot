@@ -18,6 +18,7 @@ import { bot } from 'bot';
 import 'withdrow';
 import { generateUID, getConfig, isUserInChannel, keyboard } from 'lib';
 import './callback_query';
+import { handleReferralBonus } from 'controller';
 
 
 const userPreviousMessages: any = {};
@@ -53,16 +54,7 @@ const createAccountLimiter = rateLimit({
 
 
 
-app.post('/create-account', createAccountLimiter, async (req, res) => {
-    const ip = req.ip;
-    const { referrerId, userId, username }: any = req.body;
 
-    // Validate username
-    if (!username || typeof username !== 'string' || username.trim().length === 0) {
-        return res.status(400).json({ success: false, message: 'Invalid username.' });
-    }
-
-});
 
 
 interface ALLPromise {
@@ -82,7 +74,7 @@ app.get('/getalluser', async (req, rep) => {
         const result: ALLPromise[] = [];
 
         for (let c of user) {
-            result.push({ uid: c.uid, role: c.rule, username: c.username, balance: c.bonus, userid: c.userId, status: c.status, referralUid: c.referrerId, created_at: c.createdAt })
+            result.push({ uid: c.uid, role: c.role, username: c.username, balance: c.bonus, userid: c.userId, status: c.status, referralUid: c.referrerId, created_at: c.createdAt })
         }
         return rep.status(200).json({ result })
     } catch (error) {
@@ -95,10 +87,7 @@ app.post('/config', async (req, rep) => {
     try {
         const { private_Key, token, tg_group, withdraw, toggle_bot } = req.body;
 
-
-
-
-
+ 
         // Get current configuration
         const config = await NOSQL.Config.findOne<IConfig>();
         if (!config) {
@@ -199,6 +188,7 @@ app.get('/config', async (req, rep) => {
         return rep.status(500).json({ message: 'An error occurred while fetching the configuration.', error: error.message });
     }
 });
+
 app.get('/channels', async (req, res) => {
     try {
         // Fetch all channels
@@ -208,12 +198,15 @@ app.get('/channels', async (req, res) => {
             return res.status(404).json({ message: { error: 'No channels found' } });
         }
 
-        return res.status(200).json({ message: 'Channels retrieved successfully', result });
+        
+
+        return res.status(200).json({ message: 'Channels retrieved successfully', result  });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'An error occurred while retrieving channels' });
     }
 });
+
 
 app.post('/channels', async (req, res) => {
     try {
@@ -402,9 +395,91 @@ app.post('/payment_processing', async (req, res) => {
     }
 });
 
-
-
-
+app.post('/create-account', createAccountLimiter, async (req, res) => {
+    try {
+      const { user, hash, start_param } = req.body;
+  
+      // Validate user input
+      if (!user || !user.id || typeof user.id !== 'number') {
+        return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
+      }
+  
+      // Check if the user already exists by ID or username
+      const existingUser = await NOSQL.User.findOne({ 
+        $or: [{ userId: user.id }, { username: user.username }] 
+      });
+  
+      if (existingUser) {
+        return res.status(409).json({ success: false, message: 'User with this ID or username already exists.' });
+      }
+  
+      // Initialize variables
+      let refUser = null;
+  
+      // Check for hash and start_param, and find reference user if both are provided
+      if (hash && start_param) {
+        try {
+          refUser = await NOSQL.User.findOne({ 
+            $or: [{ _id: hash }, { uid: start_param }]
+          });
+  
+          if (!refUser) {
+            return res.status(404).json({ success: false, message: 'Reference user not found.' });
+          }
+  
+          await handleReferralBonus(refUser.userId);
+        } catch (err) {
+          console.error('Error finding reference user:', err);
+          return res.status(500).json({ success: false, message: 'Error processing referral.' });
+        }
+      }
+  
+      // Create new user
+      try {
+        const newUser = await NOSQL.User.create({
+          userId: user.id,
+          uid: await generateUID(),
+          username: user.username,
+          role: 'member',
+          referrerId: start_param || null // Add referrerId if present
+        });
+  
+        return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });
+      } catch (err) {
+        console.error('Error creating new user:', err);
+        return res.status(500).json({ success: false, message: 'Error creating account.' });
+      }
+    } catch (error) {
+      // Generic error handler
+      console.error('Error creating account:', error);
+      return res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+  });
+  
+  app.get('/get-account/:id', async (req, res) => {
+    try {
+      const userId = req.params.id;
+  
+      // Validate the input userId
+      if (!userId  ) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
+      }
+  
+      // Find the user by userId
+      const user = await NOSQL.User.findOne({ _id : userId });
+  
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found.' });
+      }
+  
+      // If the user is found, return the user data
+      return res.status(200).json({ success: true, user });
+    } catch (error) {
+      console.error('Error retrieving account:', error);
+      return res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+  });
+  
 
 app.get('/', (req, res) => {
     res.json({
@@ -420,18 +495,35 @@ app.get('/', (req, res) => {
 
 app.post('/ck_channel', async (req, res) => {
     try {
-      const { task , user } = req.body; // Expecting userId and channelUsername in the request body
-
+      const { task, user } = req.body; // Expecting userId and channelUsername in the request body
+  
+      // Check if user.id is valid
+      if (!user || !user.id || typeof user.id !== 'number') {
+        return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
+      }
+  
+      // Check if task.url is valid
+      if (!task || !task.url) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing channel URL.' });
+      }
+  
       // Call the function to check if the user is in the channel
-      const isUserJoined = await isUserInChannel(user.id as number, `@${task.url}`);
+      const isUserJoined = await isUserInChannel(user.id, `@${task.url}`);
   
       // Check the result and respond accordingly
       if (isUserJoined) {
-        return res.status(200).json({ success: true, message: 'User has successfully joined the channel.'  , result : task  });
+        return res.status(200).json({ success: true, message: 'User has successfully joined the channel.', result: task });
       } else {
         return res.status(404).json({ success: false, message: 'User is not in the channel.' });
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Handle specific Telegram API errors if any
+      if (error.response) {
+        console.error('Telegram API Error:', error.response.data);
+        return res.status(500).json({ success: false, message: 'Error communicating with Telegram API.', error: error.response.data });
+      }
+  
+      // General error handling
       console.error('Error checking channel status:', error);
       return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
@@ -446,9 +538,7 @@ app.get('*', (req, res) => {
         contact: '/contact'  // Replace with your actual Telegram link
     });
 });
-
-
-
+ 
 
  
 

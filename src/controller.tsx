@@ -9,7 +9,7 @@ export async function handleReferralBonus(referrerId: number) {
     if (!referrer) return;
 
     // Calculate and add a fixed bonus
-    const bonus = 0.05; // Use a fixed referral bonus amount
+    const bonus = 0.04; // Use a fixed referral bonus amount
     referrer.bonus = (referrer.bonus || 0) + bonus;
     referrer.referralCount = (referrer.referralCount || 0) + 1;
 
@@ -89,7 +89,7 @@ export const joinedChannel = async (existingUser: IUser | null, userId: any , ms
     
     const visibleChannels: any[] = [];
 
-    if (existingUser && existingUser.rule === 'admin') {
+    if (existingUser && existingUser.role === 'admin') {
         // If the user is an admin, show all channels with status 'active' (admin and member)
         visibleChannels.push(...channelUsernames.filter((channel) => channel.status === 'active'));
     } else {

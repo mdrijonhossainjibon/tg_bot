@@ -11,7 +11,7 @@ export interface IUser extends Document {
   bonus: number;
   ipAddress: string;
   status: 'pending' | 'active' | 'banned';
-  rule: 'admin' | 'member';
+  role: 'admin' | 'member';
   createdAt: Date; // Add createdAt to the interface
   updatedAt: Date; // Add updatedAt to the interface
   lastWithdrawalDate : Date;
@@ -22,12 +22,12 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
   userId: { type: Number, required: true, unique: true },
   username: { type: String, required: true },
   wallet: { type: String, default: null },
-  referrerId: { type: Number, default: null },
+  referrerId: { type: String, default: null },
   referralCount: { type: Number, default: 0 },
   bonus: { type: Number, default: 0 },
   ipAddress: String,
   status: { type: String, default: 'active' },
-  rule: { type: String, enum: ['member', 'admin'], default: 'member' },
+  role: { type: String, enum: ['member', 'admin'], default: 'member' },
   lastWithdrawalDate: { type: Date, default: null },
 }, {
   timestamps: true // Enable timestamps
