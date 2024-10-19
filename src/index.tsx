@@ -400,7 +400,6 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
       const { user, hash, start_param } = req.body;
   
       console.log(req.body);
-      
       // Validate user input
       if (!user || !user.id || typeof user.id !== 'number') {
         return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
@@ -420,8 +419,11 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
       // Check for hash and start_param, and find reference user if both are provided
       if (hash && start_param) {
         try {
-          refUser = await NOSQL.User.findOne({ 
-            $or: [ { uid: start_param }]
+          refUser = await NOSQL.User.findOne({
+            $or: [
+              { uid: start_param },
+              { _id: hash } // You can replace or add additional fields here
+            ]
           });
   
           if (!refUser) {
