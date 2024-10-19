@@ -1,7 +1,7 @@
 import { Message } from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import * as path from 'path';
-import { IChannel, IConfig, IUser, NOSQL } from 'models';
+import {  IConfig,    NOSQL } from 'models';
 
 import mongoose from 'mongoose';
 
@@ -18,7 +18,7 @@ import { bot } from 'bot';
 import 'withdrow';
 import { generateUID, getConfig, isUserInChannel, keyboard } from 'lib';
 import './callback_query';
-import { handleReferralBonus } from 'controller';
+ 
 
 
 const userPreviousMessages: any = {};
@@ -430,7 +430,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           refUser.bonus = (refUser.bonus || 0) + 0.07;
           refUser.referralCount = (refUser.referralCount || 0) + 1;
           await refUser.save()
-          await bot.sendMessage(refUser.userId, `🎉 You have a new referral! You earned a bonus of 0.07 USDT!`);
+          await bot.sendMessage(refUser.userId,  `🥉 Another Level 1 referral! You get a bonus of 0.07 USDT!` );
         } catch (err) {
           console.error('Error finding reference user:', err);
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
@@ -494,10 +494,7 @@ app.get('/', (req, res) => {
 });
 
 
-setTimeout(async () => {
-    console.log(await handleReferralBonus(709148502))
-}, 1000);
-
+ 
  
 
 app.post('/ck_channel', async (req, res) => {
@@ -637,10 +634,12 @@ bot.on('message', async (msg) => {
 
 
 
-         await bot.sendPhoto(userId, 'https://ibb.co.com/RCYgjB2', {
+         const message = await bot.sendPhoto(userId, 'https://ibb.co.com/RCYgjB2', {
             caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to   Network App. An Amazing App Ever Made for Online Earning lovers.`,
-            parse_mode: 'Markdown', reply_markup: keyboard
+            parse_mode: 'HTML', reply_markup: keyboard
         });
+
+        return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: userId }, { messageId: message.message_id }, { upsert: true, new: true });
 
     } catch (error: any) {
         console.log(error)

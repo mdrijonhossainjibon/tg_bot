@@ -19,7 +19,16 @@ bot.on('callback_query', async (callbackQuery) => {
         const data = callbackQuery.data || '';
 
        
- 
+        const userMessageRecord = await NOSQL.UserPreviousMessage.findOne({ chatId  : userId });
+
+        if (userMessageRecord) {
+            try {
+                // Delete the previous message
+                await bot.deleteMessage(userId, parseInt(userMessageRecord.messageId));
+            } catch (error) {
+                // Handle error silently
+            }
+        }
          
         ///const checkJoined = await joinedChannel(existingUser, userId as any, msg);
  
@@ -76,7 +85,7 @@ bot.on('callback_query', async (callbackQuery) => {
  
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
-    const text = msg.text;
+   
 
     const userMessageRecord = await NOSQL.UserPreviousMessage.findOne({ chatId  });
 
@@ -91,3 +100,5 @@ bot.on('message', async (msg) => {
   
 });
 
+
+ 
