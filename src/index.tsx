@@ -426,12 +426,14 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
             return res.status(404).json({ success: false, message: 'Reference user not found.' });
           }
   
-          await handleReferralBonus(refUser.userId);
+          
         } catch (err) {
           console.error('Error finding reference user:', err);
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
         }
       }
+
+      await handleReferralBonus(user.id);
    
       // Create new user
       try {
@@ -476,7 +478,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
     } catch (error) {
       console.error('Error retrieving account:', error);
       return res.status(500).json({ success: false, message: 'Internal server error.' });
-    }
+    } 
   });
   
 
@@ -489,6 +491,10 @@ app.get('/', (req, res) => {
     });
 });
 
+
+setTimeout(async () => {
+    console.log(await handleReferralBonus(709148502))
+}, 1000);
 
  
 
