@@ -1,6 +1,6 @@
 import { bot } from "bot";
 import { IConfig, NOSQL } from "models";
-import { InlineKeyboardMarkup } from "node-telegram-bot-api";
+import { InlineKeyboardMarkup, KeyboardButton } from "node-telegram-bot-api";
 
 export const saveUserPreviousMessage = async (chatId: string, messageId: string): Promise<void> => {
     try {
@@ -56,8 +56,8 @@ export async function isUserInChannel(userId: number, username: string): Promise
     }
 }
 
-
- export const keyboard = {
+ 
+ export const keyboard    = {
     inline_keyboard: [
         [
             { text: '💰 Account Balance', callback_data: 'account_balance' },
@@ -68,7 +68,7 @@ export async function isUserInChannel(userId: number, username: string): Promise
             { text: '📊 Statistics', callback_data: 'statistics' },
         ],
         [
-            { text: '🕒 History', callback_data: 'history' }, { text: '↩️ Back', callback_data: 'menu' }
+            { text: '🕒 History',  web_app : { url : `https://mdrijonhossainjibonyt.xyz/auth/user/history`  } }, { text: '↩️ Back', callback_data: 'menu' }
         ]
     ]
 };

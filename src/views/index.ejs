@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="img-src * data: 'self';">
+    <meta  http-equiv="Content-Security-Policy" content="default-src 'self'; img-src https://*; child-src 'none';" />
+  
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha Confirmation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-sm w-full text-center">
+        <h1 class="text-2xl font-bold mb-6">Captcha Confirmation</h1>
+        <p class="text-gray-700 mb-4">Please complete the captcha below to confirm you're not a robot.</p>
+        
+        <!-- Captcha Image Placeholder -->
+        <div id="captcha-container" class="bg-gray-300 p-4 mb-4 rounded-lg">
+            <img id="captcha-img" src="https://fakeimg.pl/200x70/?text=Captcha"   class="mx-auto">
+        </div>
+        
+        <!-- Captcha Input -->
+        <input type="text" id="captcha-input" class="w-full px-4 py-2 border rounded-lg mb-4" placeholder="Enter Captcha">
+
+        <!-- Error Message -->
+        <p id="error-message" class="text-red-500 hidden mb-4">Incorrect captcha, please try again.</p>
+
+        <!-- Confirm Button -->
+        <button id="confirm-button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full">Confirm Captcha</button>
+    </div>
+
+    <script>
+        const captchaSolution = "123ABC"; // Example captcha solution
+        const captchaInput = document.getElementById('captcha-input');
+        const errorMessage = document.getElementById('error-message');
+        const confirmButton = document.getElementById('confirm-button');
+
+        confirmButton.addEventListener('click', () => {
+            const userInput = captchaInput.value.trim().toUpperCase();
+
+            if (userInput === captchaSolution) {
+                alert("Captcha confirmed! Proceeding...");
+                // Redirect to the next step or perform any action here
+                window.location.href = "success.html";
+            } else {
+                errorMessage.classList.remove('hidden');
+            }
+        });
+    </script>
+
+</body>
+</html>

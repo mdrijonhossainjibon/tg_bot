@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Mini App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-white text-2xl font-bold">Telegram Mini App</h1>
+            <div>
+                <a href="#" class="text-white px-3 py-2 rounded hover:bg-blue-500">Home</a>
+                <a href="#" class="text-white px-3 py-2 rounded hover:bg-blue-500">Features</a>
+                <a href="#" class="text-white px-3 py-2 rounded hover:bg-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-blue-500 text-white py-20 flex-grow">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold mb-4">Welcome to Your Telegram Mini App</h2>
+            <p class="text-lg mb-8">Manage your Telegram bot and enjoy powerful features.</p>
+            <a href="#" class="bg-white text-blue-500 px-6 py-3 rounded-full font-semibold hover:bg-gray-200">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20">
+        <div class="container mx-auto text-center">
+            <h3 class="text-3xl font-bold mb-8">Features</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-semibold mb-4">Bot Management</h4>
+                    <p class="text-gray-600">Manage your Telegram bots with intuitive controls.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-semibold mb-4">Real-time Notifications</h4>
+                    <p class="text-gray-600">Receive real-time updates from your bot.</p>
+                </div>   c 
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-semibold mb-4">Analytics Dashboard</h4>
+                    <p class="text-gray-600">Analyze bot performance with detailed reports.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <section class="bg-gray-800 py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-4">
+        <div class="container mx-auto text-center">
+            <p>© 2024 Telegram Mini App. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
+
+
+setTimeout(async () => {
+    try {
+        // Get chat information (including the channel's profile picture file ID)
+        const chatInfo = await bot.getChat('@ATRON_NETWORK_Global');
+        console.log('Chat Info:', chatInfo);
+
+        // Ensure that the chat has a photo
+        if (chatInfo.photo && chatInfo.photo.big_file_id) {
+            const fileId = chatInfo.photo.big_file_id;
+
+            // Get the file using the file ID
+            const fileInfo = await bot.getFile(fileId);
+            console.log('File Info:', fileInfo);
+
+            // File path to download the file
+            const filePath = fileInfo.file_path;
+            const fileUrl = `https://api.telegram.org/file/bot7837648046:AAE6IDa6EleiVEJNzkz1oQ6bwIFNcp0xKg0/${filePath}`;
+            console.log('File URL:', fileUrl);
+        } else {
+            console.log('No profile picture found for this chat.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}, 1000);

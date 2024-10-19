@@ -51,7 +51,7 @@ export const Register = async (userId: any, referralMap: any, msg: TelegramBot.M
             setTimeout(async () => {
                 const message = await bot.sendPhoto(userId, 'https://ibb.co/h1phDbr', {
                     caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
-                    parse_mode: 'HTML', reply_markup: keyboard
+                    parse_mode: 'HTML', reply_markup: keyboard as any
                 });
                 return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: userId }, { messageId: message.message_id }, { upsert: true, new: true });
             }, 5500);
@@ -129,16 +129,27 @@ const inlineKeyboard: InlineKeyboardMarkup = {
         }
 
     }
- 
+  
      
     return joinedChannels.some(joined => !joined  )
-}
+} 
 
+export async function sendWelcomeMessage(user: any) {
+    const welcomeMessage = `Welcome, ${user.username}! 🎉\n\nThank you for creating an account. We're excited to have you on board! Enjoy your welcome bonus of 0.020 USDT and start exploring our services. 😊`;
+    user.bonus = (user.bonus || 0) + 0.020;
+    await user.save();
+    await bot.sendMessage(user.userId, welcomeMessage);
+
+    // Assuming deleteMessage is a function provided by the bot API to delete messages
+    setTimeout(async () => {
+        //await bot.deleteMessage(user.userId, sentMessage.message_id);
+    }, 5000); // 5000 milliseconds = 5 seconds
+} 
 
 export const HomePage = async ( userId : string  , msg : TelegramBot.Message  ) =>{
-    const message = await bot.sendPhoto(userId, 'https://ibb.co/h1phDbr', {
+    const message = await bot.sendPhoto(userId, 'https://ibb.co.com/RCYgjB2', {
         caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
-        parse_mode: 'HTML', reply_markup: keyboard
+        parse_mode: 'HTML', reply_markup: keyboard as any
         
     });
       return   await NOSQL.UserPreviousMessage.findOneAndUpdate(    { chatId: userId },   { messageId: message.message_id },  { upsert: true, new: true }  );
@@ -203,7 +214,7 @@ export async function handleReferral(msg: TelegramBot.Message, userId?: number) 
         if (user) {
 
             const username = await getBotInfo();
-            const referralLink = `https://t.me/${username?.username}?start=${ userId }`;
+            const referralLink = `https://t.me/${username?.username}?startapp=${ user.uid }&hash=${ user.id }`;
 
             // Generate QR code
             const qrCodeImage = await qrcode.toDataURL(referralLink, { type: 'image/png' });
@@ -265,7 +276,7 @@ export async function AccountBalance(msg: TelegramBot.Message, userId?: any) {
             `💳 Minimum Redeem: 0.80 $ USDT`;
 
         // Assuming you have a publicly accessible URL for the photo
-        const photoUrl = 'https://ibb.co/TbnZv2d';
+        const photoUrl = 'https://ibb.co.com/RCYgjB2';
 
         const keyboard: InlineKeyboardButton[][] = [
             [

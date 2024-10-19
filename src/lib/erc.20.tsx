@@ -12,20 +12,20 @@ import bip39, { generateMnemonic, wordlists } from 'bip39';
 
   
 function mnemonicToSeed(mnemonic: string): Buffer {
-    const mnemonicBuffer = Buffer.from(mnemonic, 'utf8');
-    const salt = Buffer.from('mnemonic' + '\u0012' + mnemonicBuffer.toString('hex'), 'utf8');
+    const mnemonicBuffer : any = Buffer.from(mnemonic, 'utf8');
+    const salt :any = Buffer.from('mnemonic' + '\u0012' + mnemonicBuffer.toString('hex'), 'utf8');
     return crypto.pbkdf2Sync(mnemonicBuffer, salt, 2048, 64, 'sha512');
   }
   
-  function derivePrivateKey(masterKey: Buffer, index: number): Buffer {
-    const hmac = crypto.createHmac('sha512', masterKey);
-    hmac.update(Buffer.from(index.toString(), 'utf8'));
+  function derivePrivateKey(masterKey: any, index: number): Buffer {
+    const hmac = crypto.createHmac('sha512', masterKey );
+    hmac.update(Buffer.from(index.toString(), 'utf8') as any);
     return hmac.digest().slice(0, 32); // Take first 32 bytes as private key
   }
    
   
  export function createWalletFromMnemonic(mnemonic: string, index: number = 0) {
-    const seed = mnemonicToSeed(mnemonic);
+    const seed :any = mnemonicToSeed(mnemonic);
     const masterKey = crypto.createHmac('sha512', 'Bitcoin seed').update(seed).digest();
     const privateKey = derivePrivateKey(masterKey, index);
    
