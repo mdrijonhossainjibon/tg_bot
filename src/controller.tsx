@@ -229,7 +229,7 @@ export async function handleReferral(msg: TelegramBot.Message, userId?: number) 
             const caption = `*👫 Your Referral Information*\n\n` +
                 `🔗 Your Referral Link: \`${referralLink}\`\n\n` +
                 `*▪️ Your Total Referrals:* \`${user.referralCount || 0} Users\`\n\n` +
-                `*👫 Per Referral \`0.02 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
+                `*👫 Per Referral \`0.04 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
                 `*⚠️ Note:* Fake, empty, or spam users are deleted after checking.`;
 
 
@@ -273,7 +273,7 @@ export async function AccountBalance(msg: TelegramBot.Message, userId?: any) {
             `$USDT Address: ${userDetails.wallet || userDetails.uid }\n` +
             `Not Create Xrocket Wallet? Then First Create Wallet👉 [Create Wallet](https://t.me/xrocket?start=mci_G2m7TBpnA8DanfM)\n\n` +
             `👫 Refer And Earn More $USDT\n\n` +
-            `💳 Minimum Redeem: 0.80 $ USDT`;
+            `💳 Minimum Redeem: 0.50 $ USDT`;
 
         // Assuming you have a publicly accessible URL for the photo
         const photoUrl = 'https://ibb.co.com/RCYgjB2';
