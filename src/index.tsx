@@ -460,20 +460,22 @@ app.get('/get-account/:id', async (req, res) => {
     try {
         const userId = req.params.id;
 
-        // Validate the input userId
-        if (!userId) {
+        // Validate the input userId (Ensure it's non-empty and is a string)
+        if (!userId || typeof userId !== 'string') {
             return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
         }
 
-        const  userids = userId.toString()
-        const user = await NOSQL.User.findOne({ userId : userids });
+        // Perform the query with the userId
+        const user = await NOSQL.User.findOne({ userId:  parseInt(userId)});  // Ensure correct use of userId field
 
+        // If no user is found, return a 404
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
 
-        // If the user is found, return the user data
+        // Return the user data if found
         return res.status(200).json({ success: true, user });
+
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
