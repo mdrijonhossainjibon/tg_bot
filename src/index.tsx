@@ -645,7 +645,19 @@ bot.on('message', async (msg) => {
     }
 });
 
-
+bot.on('chat_join_request', (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    // Handle the join request (approve or reject)
+    bot.approveChatJoinRequest(chatId, userId)
+      .then(() => {
+        bot.sendMessage(userId, 'Welcome! Your join request has been approved.');
+      })
+      .catch(err => {
+        console.error('Failed to approve the request:', err);
+      });
+  });
+  
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
