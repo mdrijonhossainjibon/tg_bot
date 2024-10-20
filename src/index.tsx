@@ -617,7 +617,7 @@ bot.on('message', async (msg) => {
             
         const message = "🎉 5000 USDT Giveaway is OPEN! 🎉\n\nParticipate in the giveaway to stand a chance to win big rewards. 💰💸\n\n🚀 Click the button below to join the giveaway!";
  
-          bot.sendMessage(userId, message ,{  reply_markup : { inline_keyboard : [[{ text : 'Open' , web_app : { url : 'https://tg-backend-omega.vercel.app/'}}]]} });
+          bot.sendMessage(userId, message ,{  reply_markup : { inline_keyboard : [[{ text : 'Open' , web_app : { url : 'https://tg-backend-omega.vercel.app/?tgWebAppStartParam=ID4GOZMER7002'}}]]} });
           return;
         }
        
