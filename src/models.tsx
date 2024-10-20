@@ -16,13 +16,13 @@ export interface IUser extends Document {
   createdAt: Date; // Add createdAt to the interface
   updatedAt: Date; // Add updatedAt to the interface
   lastWithdrawalDate : Date;
-  hash : string;
+  
 }
 
 const UserSchema: Schema<IUser> = new Schema<IUser>({
   uid  : String,
   userId: { type: Number, required: true, unique: true },
-  hash : { type : String,  required: true, unique: true }, 
+ 
   username: { type: String, required: true },
   wallet: { type: String, default: null },
   referrerId: { type: String, default: null },

@@ -444,8 +444,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
                 userId: user.id,
                 uid: await generateUID(),
                 username: user.username,
-                role: 'member',
-                hash
+                role: 'member' 
             });
 
             return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });
