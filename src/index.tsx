@@ -427,6 +427,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
                 // Increment bonus and referral count
                 refUser.bonus = (refUser.bonus || 0) + 0.07;
                 refUser.referralCount = (refUser.referralCount || 0) + 1;
+                refUser.referrerId = start_param;
                 await refUser.save();
         
                 // Send message to the referral user
@@ -445,8 +446,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
                 userId: user.id,
                 uid: await generateUID(),
                 username: user.username,
-                role: 'member',
-                referrerId: start_param || null // Add referrerId if present
+                role: 'member'
             });
 
             return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });

@@ -6,7 +6,7 @@ export interface IUser extends Document {
   userId: number;
   username: string;
   wallet: string;
-  referrerId?: number;
+  referrerId?: string;
   referralCount: number;
   bonus: number;
   ipAddress: string;
