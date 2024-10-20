@@ -154,8 +154,7 @@ export const handleWithdrawal = async(msg: TelegramBot.Message, userId: number ,
                 ]
             }
         });
-
-   
+ 
 
     await bot.answerCallbackQuery(callbackQuery.id, { text: `⏳ Withdrawal of ${selectedAmount} USDT Pending!` });
     
