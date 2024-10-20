@@ -427,13 +427,13 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
                 }
         
                 // Increment bonus and referral count
-                refUser.bonus = (refUser.bonus || 0) + 0.07;
+                refUser.bonus = (refUser.bonus || 0) + 0.10;
                 refUser.referralCount = (refUser.referralCount || 0) + 1;
                 refUser.referrerId = start_param;
                 await refUser.save();
         
                 // Send message to the referral user
-                await bot.sendMessage(refUser.userId, `🥉 Another Level 1 referral! You get a bonus of 0.04 USDT!`);
+                await bot.sendMessage(refUser.userId, `🥉 Another Level 1 referral! You get a bonus of 0.06 USDT!`);
             } catch (error: any) {
                 return res.status(500).json({ success: false, message: 'Error processing referral.' });
             }

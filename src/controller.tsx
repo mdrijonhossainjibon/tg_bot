@@ -136,8 +136,8 @@ const inlineKeyboard: InlineKeyboardMarkup = {
 } 
 
 export async function sendWelcomeMessage(user: any) {
-    const welcomeMessage = `Welcome, ${user.username}! 🎉\n\nThank you for creating an account. We're excited to have you on board! Enjoy your welcome bonus of 0.07 USDT and start exploring our services. 😊`;
-    user.bonus = (user.bonus || 0) + 0.07;
+    const welcomeMessage = `Welcome, ${user.username}! 🎉\n\nThank you for creating an account. We're excited to have you on board! Enjoy your welcome bonus of 0.10 USDT and start exploring our services. 😊`;
+    user.bonus = (user.bonus || 0) + 0.10;
     user.newUser =  true;
     await user.save();
     await bot.sendMessage(user.userId, welcomeMessage);
@@ -204,7 +204,7 @@ export async function handleReferral(msg: TelegramBot.Message, userId?: number) 
             const caption = `*👫 Your Referral Information*\n\n` +
                 `🔗 Your Referral Link: \`${referralLink}\`\n\n` +
                 `*▪️ Your Total Referrals:* \`${user.referralCount || 0} Users\`\n\n` +
-                `*👫 Per Referral \`0.04 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
+                `*👫 Per Referral \`0.06 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
                 `*⚠️ Note:* Fake, empty, or spam users are deleted after checking.`;
 
 

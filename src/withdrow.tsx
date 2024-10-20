@@ -19,7 +19,7 @@ const generateAmountOptions = (min : number, max : number, count : number) => {
     return Array.from({ length: count }, (_, i) => +(min + i * step).toFixed(1));
   };
   
-  const amountOptions = generateAmountOptions(0.5, 10, 7);
+  const amountOptions = generateAmountOptions(0.2, 5, 7);
  
   
  
