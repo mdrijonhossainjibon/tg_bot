@@ -397,7 +397,7 @@ app.post('/payment_processing', async (req, res) => {
 
 app.post('/create-account', createAccountLimiter, async (req, res) => {
     try {
-        const { user, start_param } = req.body;
+        const { user, start_param , hash } = req.body;
 
         console.log(req.body);
         
@@ -444,12 +444,12 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
                 userId: user.id,
                 uid: await generateUID(),
                 username: user.username,
-                role: 'member'
+                role: 'member',
+                hash
             });
 
             return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });
         } catch (err) {
-            console.error('Error creating new user:', err);
             return res.status(500).json({ success: false, message: 'Error creating account.' });
         }
     } catch (error: any) {
