@@ -398,9 +398,8 @@ app.post('/payment_processing', async (req, res) => {
 
 app.post('/create-account', createAccountLimiter, async (req, res) => {
     try {
-      const { user, hash, start_param } = req.body;
-  
-      console.log(req.body);
+      const { user, start_param } = req.body;
+   
       // Validate user input
       if (!user || !user.id || typeof user.id !== 'number') {
         return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
@@ -418,14 +417,9 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
       let refUser = null;
   
       // Check for hash and start_param, and find reference user if both are provided
-      if (hash && start_param) {
+      if ( start_param ) {
         try {
-          refUser = await NOSQL.User.findOne({
-            $or: [
-              { uid: start_param },
-              { _id: hash } // You can replace or add additional fields here
-            ]
-          });
+          refUser = await NOSQL.User.findOne({ uid : start_param });
   
           if (!refUser) {
             return res.status(404).json({ success: false, message: 'Reference user not found.' });
@@ -436,8 +430,8 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           refUser.referralCount = (refUser.referralCount || 0) + 1;
           await refUser.save()
           await bot.sendMessage(refUser.userId,  `🥉 Another Level 1 referral! You get a bonus of 0.04 USDT!` );
-        } catch (err) {
-          console.error('Error finding reference user:', err);
+        } catch (error :any) {
+            console.error(error.message);
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
         }
       }
@@ -457,9 +451,9 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
         console.error('Error creating new user:', err);
         return res.status(500).json({ success: false, message: 'Error creating account.' });
       }
-    } catch (error) {
+    } catch (error:any) {
       // Generic error handler
-      console.error('Error creating account:', error);
+      console.error(error.message);
       return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
   });
