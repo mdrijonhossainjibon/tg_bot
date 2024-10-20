@@ -416,7 +416,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
 
         let refUser = null;
 
-        if (start_param && typeof start_param === 'string') {
+        if (start_param && typeof start_param === 'string' && start_param !== 'undefined') {
             try {
                 refUser = await NOSQL.User.findOne({ uid: start_param });
         
