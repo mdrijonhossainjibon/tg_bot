@@ -441,7 +441,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
          
         try {
             const newUser = await NOSQL.User.create({
-                userId: user.id,
+                userId: parseInt(user.id),
                 uid: await generateUID(),
                 username: user.username,
                 role: 'member' 
