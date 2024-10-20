@@ -42,7 +42,8 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
 export interface IChannel extends Document {
   
   username: string;
-  channelurl : string;
+  path  : string;
+  title: string;
   status : 'deactive' | 'active';
   role : 'admin' | 'member';
   created_at : Date;
@@ -51,7 +52,8 @@ export interface IChannel extends Document {
 
 const ChannelSchema: Schema<IChannel> = new Schema<IChannel> ({
   username: { type: String, required: true },
-  channelurl : { type: String, required: true },
+  path : { type: String, required: true },
+  title : { type: String  },
   status : { type: String, default : 'active' },
   role : { type: String, enum: ['member', 'admin'], default: 'member' },
   created_at: { type: Date, default: Date.now },

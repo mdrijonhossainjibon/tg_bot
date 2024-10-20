@@ -108,36 +108,9 @@ app.post('/config', async (req, rep) => {
             config.paymentKey = token;
         }
 
-        // Insert Telegram group data if available
-        if (Array.isArray(tg_group) && tg_group.length > 0) {
-            // Fetch existing groups from the database
-            const existingGroups = await NOSQL.Channel.find({ username: { $in: tg_group.map(g => g.username) } });
-
-            // Prepare updates and new inserts
-            const updates: Promise<any>[] = [];
-            const newGroups = tg_group.filter(group =>
-                !existingGroups.some(existing => existing.username === group.username)
-            );
-
-            // Prepare updates for existing groups
-            existingGroups.forEach(existing => {
-                const groupToUpdate = tg_group.find(g => g.username === existing.username);
-                if (groupToUpdate) {
-                    updates.push(NOSQL.Channel.updateOne(
-                        { username: existing.username },
-                        { $set: groupToUpdate }
-                    ));
-                }
-            });
-
-            // Insert new groups
-            if (newGroups.length > 0) {
-                updates.push(NOSQL.Channel.insertMany(newGroups));
-            }
-
-            // Wait for all updates and inserts to resolve
-            promises.push(...updates);
-        }
+      
+        
+       
 
 
         // Update withdraw setting if provided
@@ -157,8 +130,48 @@ app.post('/config', async (req, rep) => {
         // Wait for all promises to resolve
         await Promise.all(promises);
 
-        // Return success response
-        return rep.status(200).json({ message: { success: 'Configuration updated successfully.' } });
+        
+         rep.status(200).json({ message: { success: 'Configuration updated successfully.' } });
+
+        if (Array.isArray(tg_group) && tg_group.length > 0) {
+            // Fetch existing groups from the database
+            const existingGroups = await NOSQL.Channel.find({ username: { $in: tg_group.map(g => g) } });
+         
+             if(existingGroups.length > 0 ) return;
+
+            // Prepare updates and new inserts
+            const updates: Promise<any>[] = [];
+            const newGroups = tg_group.filter(group =>  !existingGroups.some(existing => existing.username === group.username)  );
+           
+            
+            // Insert new groups
+            if (newGroups.length > 0) {
+                const newGroupsWithChatInfo = [];
+                for (const group of newGroups) {
+                    
+                    try {
+                        // Fetch chat information for new groups
+                        const chatInfo = await bot.getChat(group);
+                        const path  = chatInfo.photo ? chatInfo.photo.big_file_id : null;
+                        const title = chatInfo.title
+                        newGroupsWithChatInfo.push({ username : group , path  , title });
+                    } catch (error) {
+                        newGroupsWithChatInfo.push(group); // Add without profile picture if fetching fails
+                    }
+                }
+
+               
+        
+                // Insert new groups with profile picture info if available
+                if (newGroupsWithChatInfo.length > 0) {
+                    updates.push(NOSQL.Channel.insertMany(newGroupsWithChatInfo));
+                }
+            }
+        
+            // Wait for all updates and inserts to resolve
+            promises.push(...updates);
+        }
+        
     } catch (error: any) {
         return rep.status(500).json({ message: 'An error occurred while updating configuration.', error: error.message });
     }
@@ -173,7 +186,7 @@ app.get('/config', async (req, rep) => {
 
         const tg_group = {
             username: channels.map(channel => channel.username),
-            channel: channels.map(channel => channel.channelurl) // Assuming 'channelUrl' is the field for URLs
+            channel: channels.map(channel => channel.path) // Assuming 'channelUrl' is the field for URLs
         };
 
         // Send the configuration in the response
@@ -199,14 +212,29 @@ app.get('/channels', async (req, res) => {
             return res.status(404).json({ message: { error: 'No channels found' } });
         }
 
+        // Array to hold the file information for each channel
+        const fileInfos = await Promise.all(
+            result.map(async (channel) => {
+                try {
+                    // Assuming each channel has a profile picture file ID
+                    const fileInfo = await bot.getFile(channel.path);
+                    const url = channel.username.split('@')[1];
+                    return { username: channel.username, path : fileInfo.file_path , title  : channel.title  , url,  description: 'Follow the channel'  };  // Include the username and the file info
+                } catch (error) {
+                    console.error(`Failed to get file info for ${channel.username}`, error);
+                    return { username: channel.username, fileInfo: null }; // Return null if file info fails
+                }
+            })
+        );
 
-
-        return res.status(200).json({ message: 'Channels retrieved successfully', result });
+        // Respond with both the channels and their associated file information
+        return res.status(200).json({   message: 'Channels retrieved successfully', result : fileInfos });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'An error occurred while retrieving channels' });
     }
 });
+
 
 
 app.post('/channels', async (req, res) => {
@@ -397,14 +425,18 @@ app.post('/payment_processing', async (req, res) => {
 
 app.post('/create-account', createAccountLimiter, async (req, res) => {
     try {
-        const { user, start_param , hash } = req.body;
+        const { user, start_param } = req.body;
 
-        console.log(req.body);
-        
+         
         // Validate user input
         if (!user || !user.id || typeof user.id !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
         }
+        if (user.language_code === 'en' ) {
+            return res.status(400).json({ success: false, message: 'Access  is restricted to users  Country' });
+    
+        } 
+        
 
         // Check if the user already exists by ID or username
         const existingUser = await NOSQL.User.findOne({
