@@ -136,15 +136,11 @@ const inlineKeyboard: InlineKeyboardMarkup = {
 } 
 
 export async function sendWelcomeMessage(user: any) {
-    const welcomeMessage = `Welcome, ${user.username}! 🎉\n\nThank you for creating an account. We're excited to have you on board! Enjoy your welcome bonus of 0.020 USDT and start exploring our services. 😊`;
-    user.bonus = (user.bonus || 0) + 0.020;
+    const welcomeMessage = `Welcome, ${user.username}! 🎉\n\nThank you for creating an account. We're excited to have you on board! Enjoy your welcome bonus of 0.07 USDT and start exploring our services. 😊`;
+    user.bonus = (user.bonus || 0) + 0.07;
     await user.save();
     await bot.sendMessage(user.userId, welcomeMessage);
-
-    // Assuming deleteMessage is a function provided by the bot API to delete messages
-    setTimeout(async () => {
-        //await bot.deleteMessage(user.userId, sentMessage.message_id);
-    }, 5000); // 5000 milliseconds = 5 seconds
+ 
 } 
 
 export const HomePage = async ( userId : string  , msg : TelegramBot.Message  ) =>{
@@ -172,30 +168,7 @@ export const WithdrawalsMaintenance = async(existingUser: IUser | null, userId: 
 }
 
 
-
-
-export async function refundUser(userId: string, amount: number ,  symbol : string ) {
-    try {
-         
-        // Fetch the user by ID
-        const user = await NOSQL.User.findOne({ userId });
-        if (!user) {
-            const message = await bot.sendMessage(userId, '❌ User not found.');
-            return   await NOSQL.UserPreviousMessage.findOneAndUpdate(    { chatId: userId },   { messageId: message.message_id },  { upsert: true, new: true }  );
-        }
-
-        // Update the user's balance
-        user.bonus += amount; // Assuming the balance is stored as a number
-        await user.save();
-
-        // Notify the user about the refund
-        const message = await bot.sendMessage(userId, `🔄 Refund successful! An amount of ${amount} ${symbol} has been added to the user's account.`);
-        return   await NOSQL.UserPreviousMessage.findOneAndUpdate(    { chatId: userId },   { messageId: message.message_id },  { upsert: true, new: true }  );
-    } catch (error) {
-
-    }
-}
-
+ 
 
 
 
@@ -230,7 +203,7 @@ export async function handleReferral(msg: TelegramBot.Message, userId?: number) 
             const caption = `*👫 Your Referral Information*\n\n` +
                 `🔗 Your Referral Link: \`${referralLink}\`\n\n` +
                 `*▪️ Your Total Referrals:* \`${user.referralCount || 0} Users\`\n\n` +
-                `*👫 Per Referral \`0.07 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
+                `*👫 Per Referral \`0.04 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
                 `*⚠️ Note:* Fake, empty, or spam users are deleted after checking.`;
 
 

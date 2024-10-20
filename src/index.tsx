@@ -18,6 +18,7 @@ import { bot } from 'bot';
 import 'withdrow';
 import { generateUID, getConfig, isUserInChannel, keyboard } from 'lib';
 import './callback_query';
+import { sendWelcomeMessage } from 'controller';
  
 
 
@@ -434,7 +435,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           refUser.bonus = (refUser.bonus || 0) + 0.07;
           refUser.referralCount = (refUser.referralCount || 0) + 1;
           await refUser.save()
-          await bot.sendMessage(refUser.userId,  `🥉 Another Level 1 referral! You get a bonus of 0.07 USDT!` );
+          await bot.sendMessage(refUser.userId,  `🥉 Another Level 1 referral! You get a bonus of 0.04 USDT!` );
         } catch (err) {
           console.error('Error finding reference user:', err);
           return res.status(500).json({ success: false, message: 'Error processing referral.' });
@@ -450,7 +451,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
           role: 'member',
           referrerId: start_param || null // Add referrerId if present
         });
-  
+       await sendWelcomeMessage(newUser)
         return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });
       } catch (err) {
         console.error('Error creating new user:', err);
