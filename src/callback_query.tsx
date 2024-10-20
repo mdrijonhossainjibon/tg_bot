@@ -3,7 +3,7 @@ import { AccountBalance, getStatistics, handleReferral, HomePage, joinedChannel,
  
 
 import { NOSQL } from "models";
-import {  handleWithdrawalAmount, handleWithdrawalOption } from "withdrow";
+import {  handleWithdrawal, handleWithdrawalAmount, handleWithdrawalOption } from "withdrow";
 
 const userStateStore = new Map<number, string>(); // userId -> state
  
@@ -70,6 +70,7 @@ bot.on('callback_query', async (callbackQuery) => {
             default:
                 const amountMatch = data.match(/^withdraw_(\d+(\.\d{1,2})?)$/);
                 if (amountMatch) {
+                   await handleWithdrawal(msg , userId, amountMatch[1] , 'xrocket' , callbackQuery)
                    
                 }
                 break;
