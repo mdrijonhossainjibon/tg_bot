@@ -416,6 +416,8 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
 
         let refUser = null;
 
+
+        console.log(req.body)
         // Check for hash and start_param, and find reference user if both are provided
         if (start_param) {
             try {
