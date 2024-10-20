@@ -158,7 +158,7 @@ export async function handleReferral(msg: TelegramBot.Message, userId?: number) 
             const caption = `*👫 Your Referral Information*\n\n` +
                 `🔗 Your Referral Link: \`${referralLink}\`\n\n` +
                 `*▪️ Your Total Referrals:* \`${user.referralCount || 0} Users\`\n\n` +
-                `*👫 Per Referral \`0.02 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
+                `*👫 Per Referral \`0.035 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
                 `*⚠️ Note:* Fake, empty, or spam users are deleted after checking.`;
 
 
