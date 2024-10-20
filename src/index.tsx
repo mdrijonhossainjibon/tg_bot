@@ -438,10 +438,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
             }
         } 
         
-        
-       
-
-        // Create new user
+         
         try {
             const newUser = await NOSQL.User.create({
                 userId: user.id,
