@@ -465,8 +465,8 @@ app.get('/get-account/:id', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
         }
 
-        // Find the user by userId
-        const user = await NOSQL.User.findOne({ userId });
+        const  userids = userId.toString()
+        const user = await NOSQL.User.findOne({ userId : userids });
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found.' });
@@ -475,11 +475,13 @@ app.get('/get-account/:id', async (req, res) => {
         // If the user is found, return the user data
         return res.status(200).json({ success: true, user });
     } catch (error) {
-        console.error('Error retrieving account:', error);
         return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
 });
 
+
+
+//rjdhfuy
 
 app.get('/', (req, res) => {
     res.json({
