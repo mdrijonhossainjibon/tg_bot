@@ -7,20 +7,7 @@ import qrcode from 'qrcode';
 
 
 
-export async function handleReferralBonus(referrerId: number) {
-    const referrer = await NOSQL.User.findOne({ userId: referrerId });
-    if (!referrer) return;
-
-    // Calculate and add a fixed bonus
-    const bonus = 0.04; // Use a fixed referral bonus amount
-    referrer.bonus = (referrer.bonus || 0) + bonus;
-    referrer.referralCount = (referrer.referralCount || 0) + 1;
-
-    await referrer.save();
-
-    // Send a notification message to the referrer
-     await bot.sendMessage(referrer.userId, `🎉 You have a new referral! You earned a bonus of ${bonus} USDT!`);
-}
+ 
 
 
 export const  getBotInfo = async () =>{
@@ -31,40 +18,7 @@ export const  getBotInfo = async () =>{
     }
 }
 
-
-export const Register = async (userId: any, referralMap: any, msg: TelegramBot.Message) => {
-   
-    try {
-
-        const config = await getConfig();
-
-        if (config.toggle_bot === 'off') {
-            return bot.sendMessage(userId, '🔧 The bot is currently under maintenance. Please check back later.' ,{ reply_to_message_id :  msg.message_id });
-        }
-
-        const admins = await NOSQL.User.findOne({ userId });
-        const checkJoined = await joinedChannel(admins, userId as any, msg);
  
-        if ( checkJoined ) return;
- 
-         const { response } = await API_CALL({ url: 'create-account', body: { userId, referrerId: referralMap.get(userId), username: msg.chat.username }, method: 'post' });
-        if (response && response.success) {
-            setTimeout(async () => {
-                const message = await bot.sendPhoto(userId, 'https://ibb.co/h1phDbr', {
-                    caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
-                    parse_mode: 'HTML', reply_markup: keyboard as any
-                });
-                return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: userId }, { messageId: message.message_id }, { upsert: true, new: true });
-            }, 5500);
-        } else {
-            const message = await bot.sendPhoto(userId, 'https://ibb.co/0KB4TMb', { caption: response?.message as string, reply_markup: { inline_keyboard: [[{ text: '↩️ Back', callback_data: 'menu' }]] } });
-            return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: userId }, { messageId: message.message_id }, { upsert: true, new: true });
-        }
-    } catch (error) {
-
-    }
-
-}
 
 
 export const joinedChannel = async (existingUser: IUser | null, userId: any , msg :TelegramBot.Message) => {
@@ -204,7 +158,7 @@ export async function handleReferral(msg: TelegramBot.Message, userId?: number) 
             const caption = `*👫 Your Referral Information*\n\n` +
                 `🔗 Your Referral Link: \`${referralLink}\`\n\n` +
                 `*▪️ Your Total Referrals:* \`${user.referralCount || 0} Users\`\n\n` +
-                `*👫 Per Referral \`0.06 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
+                `*👫 Per Referral \`0.02 $USDT\` - Share Your referral link with your friends & earn unlimited \`$USDT\`*\n\n` +
                 `*⚠️ Note:* Fake, empty, or spam users are deleted after checking.`;
 
 
@@ -248,7 +202,7 @@ export async function AccountBalance(msg: TelegramBot.Message, userId?: any) {
             `$USDT Address: ${userDetails.wallet || userDetails.uid }\n` +
             `Not Create Xrocket Wallet? Then First Create Wallet👉 [Create Wallet](https://t.me/xrocket?start=mci_G2m7TBpnA8DanfM)\n\n` +
             `👫 Refer And Earn More $USDT\n\n` +
-            `💳 Minimum Redeem: 0.50 $ USDT`;
+            `💳 Minimum Redeem: 0.60 $ USDT`;
 
         // Assuming you have a publicly accessible URL for the photo
         const photoUrl = 'https://ibb.co.com/RCYgjB2';
