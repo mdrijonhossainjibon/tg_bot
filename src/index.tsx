@@ -339,7 +339,6 @@ app.post('/payment_processing', async (req, res) => {
                             reply_markup: {
                                 inline_keyboard: [
                                     [
-                                        { text: '✅ Payment Channel', url: `https://t.me/RR0000110/${index.public_id}` },
                                         { text: '↩️ Back', callback_data: 'menu' }
                                     ]
                                 ]

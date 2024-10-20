@@ -67,7 +67,6 @@ interface IWithdrawalHistory extends Document {
   method : 'wallet' | 'xrocket';
   wallet : string;
   proposerId?: number;
-  public_id : string;
   username : string;
   date: Date;
 }
@@ -79,7 +78,6 @@ const WithdrawalHistorySchema: Schema<IWithdrawalHistory> = new Schema({
   amount: { type: Number, required: true },
   symbol: { type: String, default : 'USDT' },
   hash: { type: String, default : null },
-  public_id : String ,
   status: { type: String, enum: ['pending' , 'success' , 'fail'],   default:  'pending' },
   method : { type : String , enum : [ 'wallet' , 'xrocket'] ,    default :  'xrocket'},
   wallet : {  type : String , default : null  }, 

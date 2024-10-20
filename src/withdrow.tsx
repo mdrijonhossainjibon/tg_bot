@@ -158,13 +158,10 @@ export const handleWithdrawal = async(msg: TelegramBot.Message, userId: number ,
    
 
     await bot.answerCallbackQuery(callbackQuery.id, { text: `⏳ Withdrawal of ${selectedAmount} USDT Pending!` });
-    const public_id = await bot.sendMessage('@testonly6432', `⏳ <b>Withdrawal Sent Pending</b>\n\n<b>Amount:</b> ${selectedAmount} $USDT \n<b>Wallet:</b> ${user.userId} @XROCKET\n<b>User:</b> @${callbackQuery.message?.chat.username || callbackQuery.message?.chat.first_name || ' '}  \n\nB🤖T- @RR0024_bot`,
-        { parse_mode: 'HTML' } 
-    );
     
      user.lastWithdrawalDate = today;
      await user.save();
-    await NOSQL.WithdrawalHistory.create({ userId, amount: selectedAmount, proposerId: message.message_id, public_id: public_id.message_id, username: callbackQuery.message?.chat.username || callbackQuery.message?.chat.first_name || null , method : options  , wallet : user.wallet })
+    await NOSQL.WithdrawalHistory.create({ userId, amount: selectedAmount, proposerId: message.message_id, username: callbackQuery.message?.chat.username || callbackQuery.message?.chat.first_name || null , method : options  , wallet : user.wallet })
     return  await NOSQL.UserPreviousMessage.findOneAndUpdate(   { chatId: userId },  { messageId: message.message_id },  { upsert: true, new: true }  );
 }    
 
