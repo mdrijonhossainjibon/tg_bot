@@ -302,6 +302,7 @@ app.post('/payment_processing', async (req, res) => {
         let baseURL: string | undefined;
 
 
+        res.status(201).json({ success: true, message: 'Payment processed successfully' });
 
         for (let index of history) {
             const tgUserId = parseInt(index.userId as any, 10);
@@ -309,7 +310,7 @@ app.post('/payment_processing', async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Invalid tgUserId. It must be a positive number.' });
             }
 
-            const content = `✅ <b>Withdrawal Sent Successfully</b>\n\n<b>Amount:</b> ${index.amount} USDT \n<b>WALLET:</b> ${index.userId}\n\n🤖BOT: @RR0024_bot`;
+            const content = `✅ <b>Withdrawal Sent Successfully</b>\n\n<b>Amount:</b> ${index.amount} USDT \n<b>WALLET:</b> ${index.userId}\n\n🤖BOT: @RR_Supporters_bot`;
             const refundAmount = index.amount;
             const user = await NOSQL.User.findOne({ userId: index.userId });
             const transferId = tgUserId.toString() + Math.random().toString(36).substring(2, 10);
@@ -389,7 +390,6 @@ app.post('/payment_processing', async (req, res) => {
             }
         }
 
-        return res.status(201).json({ success: true, message: 'Payment processed successfully' });
     } catch (error) {
         return res.status(500).json({ message: 'An error occurred during payment processing.' });
     }
