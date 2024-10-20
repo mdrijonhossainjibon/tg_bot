@@ -441,7 +441,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
          
         try {
             const newUser = await NOSQL.User.create({
-                userId: parseInt(user.id),
+                userId: user.id.toString(),
                 uid: await generateUID(),
                 username: user.username,
                 role: 'member' 
@@ -452,8 +452,6 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
             return res.status(500).json({ success: false, message: 'Error creating account.' });
         }
     } catch (error: any) {
-        // Generic error handler
-        console.error(error.message);
         return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
 });
