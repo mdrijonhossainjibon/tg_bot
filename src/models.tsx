@@ -10,6 +10,7 @@ export interface IUser extends Document {
   referralCount: number;
   bonus: number;
   ipAddress: string;
+  newUser : boolean;
   status: 'pending' | 'active' | 'banned';
   role: 'admin' | 'member';
   createdAt: Date; // Add createdAt to the interface
@@ -28,6 +29,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
   ipAddress: String,
   status: { type: String, default: 'active' },
   role: { type: String, enum: ['member', 'admin'], default: 'member' },
+  newUser : { type : Boolean , default :  false },
   lastWithdrawalDate: { type: Date, default: null },
 }, {
   timestamps: true // Enable timestamps

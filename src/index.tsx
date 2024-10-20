@@ -1,7 +1,7 @@
 import { Message } from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import * as path from 'path';
-import {  IConfig,    NOSQL } from 'models';
+import { IConfig, NOSQL } from 'models';
 
 import mongoose from 'mongoose';
 
@@ -19,7 +19,7 @@ import 'withdrow';
 import { generateUID, getConfig, isUserInChannel, keyboard } from 'lib';
 import './callback_query';
 import { sendWelcomeMessage } from 'controller';
- 
+
 
 
 const userPreviousMessages: any = {};
@@ -88,7 +88,7 @@ app.post('/config', async (req, rep) => {
     try {
         const { private_Key, token, tg_group, withdraw, toggle_bot } = req.body;
 
- 
+
         // Get current configuration
         const config = await NOSQL.Config.findOne<IConfig>();
         if (!config) {
@@ -199,9 +199,9 @@ app.get('/channels', async (req, res) => {
             return res.status(404).json({ message: { error: 'No channels found' } });
         }
 
-        
 
-        return res.status(200).json({ message: 'Channels retrieved successfully', result  });
+
+        return res.status(200).json({ message: 'Channels retrieved successfully', result });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'An error occurred while retrieving channels' });
@@ -398,90 +398,90 @@ app.post('/payment_processing', async (req, res) => {
 
 app.post('/create-account', createAccountLimiter, async (req, res) => {
     try {
-      const { user, start_param } = req.body;
-   
-      // Validate user input
-      if (!user || !user.id || typeof user.id !== 'number') {
-        return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
-      }
-  
-      // Check if the user already exists by ID or username
-      const existingUser = await NOSQL.User.findOne({ 
-        $or: [{ userId: user.id }, { username: user.username }] 
-      });
-  
-      if (existingUser) {
-        return res.status(409).json({ success: false, message: 'User with this ID or username already exists.' });
-      }
-  
-      let refUser = null;
-  
-      // Check for hash and start_param, and find reference user if both are provided
-      if ( start_param ) {
-        try {
-          refUser = await NOSQL.User.findOne({ uid : start_param });
-  
-          if (!refUser) {
-            return res.status(404).json({ success: false, message: 'Reference user not found.' });
-          }
-  
-          
-          refUser.bonus = (refUser.bonus || 0) + 0.07;
-          refUser.referralCount = (refUser.referralCount || 0) + 1;
-          await refUser.save()
-          await bot.sendMessage(refUser.userId,  `🥉 Another Level 1 referral! You get a bonus of 0.04 USDT!` );
-        } catch (error :any) {
-            console.error(error.message);
-          return res.status(500).json({ success: false, message: 'Error processing referral.' });
-        }
-      }
+        const { user, start_param } = req.body;
 
-      // Create new user
-      try {
-        const newUser = await NOSQL.User.create({
-          userId: user.id,
-          uid: await generateUID(),
-          username: user.username,
-          role: 'member',
-          referrerId: start_param || null // Add referrerId if present
+        // Validate user input
+        if (!user || !user.id || typeof user.id !== 'number') {
+            return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
+        }
+
+        // Check if the user already exists by ID or username
+        const existingUser = await NOSQL.User.findOne({
+            $or: [{ userId: user.id }, { username: user.username }]
         });
-       await sendWelcomeMessage(newUser)
-        return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });
-      } catch (err) {
-        console.error('Error creating new user:', err);
-        return res.status(500).json({ success: false, message: 'Error creating account.' });
-      }
-    } catch (error:any) {
-      // Generic error handler
-      console.error(error.message);
-      return res.status(500).json({ success: false, message: 'Internal server error.' });
+
+        if (existingUser) {
+            return res.status(409).json({ success: false, message: 'User with this ID or username already exists.' });
+        }
+
+        let refUser = null;
+
+        // Check for hash and start_param, and find reference user if both are provided
+        if (start_param) {
+            try {
+                refUser = await NOSQL.User.findOne({ uid: start_param });
+
+                if (!refUser) {
+                    return res.status(404).json({ success: false, message: 'Reference user not found.' });
+                }
+
+
+                refUser.bonus = (refUser.bonus || 0) + 0.07;
+                refUser.referralCount = (refUser.referralCount || 0) + 1;
+                await refUser.save()
+                await bot.sendMessage(refUser.userId, `🥉 Another Level 1 referral! You get a bonus of 0.04 USDT!`);
+            } catch (error: any) {
+                console.error(error.message);
+                return res.status(500).json({ success: false, message: 'Error processing referral.' });
+            }
+        }
+
+        // Create new user
+        try {
+            const newUser = await NOSQL.User.create({
+                userId: user.id,
+                uid: await generateUID(),
+                username: user.username,
+                role: 'member',
+                referrerId: start_param || null // Add referrerId if present
+            });
+
+            return res.status(201).json({ success: true, message: 'Account created successfully.', user: newUser });
+        } catch (err) {
+            console.error('Error creating new user:', err);
+            return res.status(500).json({ success: false, message: 'Error creating account.' });
+        }
+    } catch (error: any) {
+        // Generic error handler
+        console.error(error.message);
+        return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
-  });
-  
-  app.get('/get-account/:id', async (req, res) => {
+});
+
+app.get('/get-account/:id', async (req, res) => {
     try {
-      const userId = req.params.id;
-  
-      // Validate the input userId
-      if (!userId  ) {
-        return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
-      }
-  
-      // Find the user by userId
-      const user = await NOSQL.User.findOne({  userId });
-  
-      if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found.' });
-      }
-  
-      // If the user is found, return the user data
-      return res.status(200).json({ success: true, user });
+        const userId = req.params.id;
+
+        // Validate the input userId
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
+        }
+
+        // Find the user by userId
+        const user = await NOSQL.User.findOne({ userId });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        // If the user is found, return the user data
+        return res.status(200).json({ success: true, user });
     } catch (error) {
-      console.error('Error retrieving account:', error);
-      return res.status(500).json({ success: false, message: 'Internal server error.' });
-    } 
-  });
-  
+        console.error('Error retrieving account:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
+
 
 app.get('/', (req, res) => {
     res.json({
@@ -493,45 +493,45 @@ app.get('/', (req, res) => {
 });
 
 
- 
- 
+
+
 
 app.post('/ck_channel', async (req, res) => {
     try {
-      const { task, user } = req.body; // Expecting userId and channelUsername in the request body
-  
-      // Check if user.id is valid
-      if (!user || !user.id || typeof user.id !== 'number') {
-        return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
-      }
-  
-      // Check if task.url is valid
-      if (!task || !task.url) {
-        return res.status(400).json({ success: false, message: 'Invalid or missing channel URL.' });
-      }
-  
-      // Call the function to check if the user is in the channel
-      const isUserJoined = await isUserInChannel(user.id, `@${task.url}`);
-  
-      // Check the result and respond accordingly
-      if (isUserJoined) {
-        return res.status(200).json({ success: true, message: 'User has successfully joined the channel.', result: task });
-      } else {
-        return res.status(404).json({ success: false, message: 'User is not in the channel.' });
-      }
+        const { task, user } = req.body; // Expecting userId and channelUsername in the request body
+
+        // Check if user.id is valid
+        if (!user || !user.id || typeof user.id !== 'number') {
+            return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
+        }
+
+        // Check if task.url is valid
+        if (!task || !task.url) {
+            return res.status(400).json({ success: false, message: 'Invalid or missing channel URL.' });
+        }
+
+        // Call the function to check if the user is in the channel
+        const isUserJoined = await isUserInChannel(user.id, `@${task.url}`);
+
+        // Check the result and respond accordingly
+        if (isUserJoined) {
+            return res.status(200).json({ success: true, message: 'User has successfully joined the channel.', result: task });
+        } else {
+            return res.status(404).json({ success: false, message: 'User is not in the channel.' });
+        }
     } catch (error: any) {
-      // Handle specific Telegram API errors if any
-      if (error.response) {
-        console.error('Telegram API Error:', error.response.data);
-        return res.status(500).json({ success: false, message: 'Error communicating with Telegram API.', error: error.response.data });
-      }
-  
-      // General error handling
-      console.error('Error checking channel status:', error);
-      return res.status(500).json({ success: false, message: 'Internal server error.' });
+        // Handle specific Telegram API errors if any
+        if (error.response) {
+            console.error('Telegram API Error:', error.response.data);
+            return res.status(500).json({ success: false, message: 'Error communicating with Telegram API.', error: error.response.data });
+        }
+
+        // General error handling
+        console.error('Error checking channel status:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error.' });
     }
-  });
-  
+});
+
 
 app.get('*', (req, res) => {
     res.json({
@@ -541,42 +541,9 @@ app.get('*', (req, res) => {
         contact: '/contact'  // Replace with your actual Telegram link
     });
 });
- 
-
- 
 
 
-bot.onText(/\/start(?:\s+(\d+))?/, async (msg: Message, match: RegExpExecArray | null) => {
-    try {
-        const chatId = msg.chat.id;
-        const userId = msg.from?.id;
-        const username = msg.chat.username;
 
-        // Check if the username is not set
-        if (!username) {
-            bot.sendMessage(chatId, "Error: Your username is not set. Please set a username in your Telegram settings.");
-            return;  // Stop further execution if the username is missing
-        }
-
-        // Check if the user already exists
-        const user = await NOSQL.User.findOne({ userId });
-
-        // If the user doesn't exist, create a new user record
-        if (!user) {
-            await NOSQL.User.create({ username, userId , uid : await generateUID() });
-            await bot.sendPhoto(userId as number, 'https://ibb.co.com/RCYgjB2', {
-                caption: `Hi <b>@${username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
-                parse_mode: 'HTML', reply_markup: keyboard as any
-            });
-        }
-        await bot.sendPhoto(userId as number, 'https://ibb.co.com/RCYgjB2', {
-            caption: `Hi <b>@${username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
-            parse_mode: 'HTML', reply_markup: keyboard as  any
-        });
-    } catch (error) {
-
-    }
-});
 
 
 
@@ -613,7 +580,7 @@ bot.on('message', async (msg) => {
         const userId = msg.chat.id;
         const text = msg.text;
         const startCommandRegex = /^\/start(?:\s+(\d+))?$/;
-        if (text === '/start') return;
+
         if (startCommandRegex.test(text as string)) {
             const match = startCommandRegex.exec(text as string);
             const numericParam = match && match[1] ? parseInt(match[1], 10) : undefined;
@@ -625,6 +592,40 @@ bot.on('message', async (msg) => {
             return bot.sendMessage(userId, '🔧 The bot is currently under maintenance. Please check back later.');
         }
 
+        const user = await NOSQL.User.findOne({ userId });
+
+        if (user) {
+
+            if (text === '/start welcome' && !user.newUser) {
+                
+                await sendWelcomeMessage(user);
+                const message = await bot.sendPhoto(userId, 'https://ibb.co.com/RCYgjB2', {
+                    caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to   Network App. An Amazing App Ever Made for Online Earning lovers.`,
+                    parse_mode: 'HTML', reply_markup: keyboard
+                });
+                return;
+            }
+ 
+
+        }
+        if (!user) {
+            
+        const message = "🎉 5000 USDT Giveaway is OPEN! 🎉\n\nParticipate in the giveaway to stand a chance to win big rewards. 💰💸\n\n🚀 Click the button below to join the giveaway!";
+ 
+          bot.sendMessage(userId, message ,{  reply_markup : { inline_keyboard : [[{ text : 'Open' , web_app : { url : 'https://tg-backend-omega.vercel.app/'}}]]} });
+          return;
+        }
+       
+ 
+
+        const message = await bot.sendPhoto(userId, 'https://ibb.co.com/RCYgjB2', {
+            caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to   Network App. An Amazing App Ever Made for Online Earning lovers.`,
+            parse_mode: 'HTML', reply_markup: keyboard
+        });
+
+        return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: userId }, { messageId: message.message_id }, { upsert: true, new: true });
+
+
 
         //const user = await NOSQL.User.findOne({ userId });
         //const checkJoined = await joinedChannel(user, userId as any, msg);
@@ -633,35 +634,16 @@ bot.on('message', async (msg) => {
 
 
 
-         const message = await bot.sendPhoto(userId, 'https://ibb.co.com/RCYgjB2', {
-            caption: `Hi <b>@${msg.chat.username}</b> ✌️\nThis is Earning Bot. Welcome to   Network App. An Amazing App Ever Made for Online Earning lovers.`,
-            parse_mode: 'HTML', reply_markup: keyboard
-        });
-
-        return await NOSQL.UserPreviousMessage.findOneAndUpdate({ chatId: userId }, { messageId: message.message_id }, { upsert: true, new: true });
-
     } catch (error: any) {
         console.log(error)
     }
 });
 
-bot.on('chat_join_request', (msg) => {
-    const chatId = msg.chat.id;
-    const userId = msg.from.id;
-    // Handle the join request (approve or reject)
-    bot.approveChatJoinRequest(chatId, userId)
-      .then(() => {
-        bot.sendMessage(userId, 'Welcome! Your join request has been approved.');
-      })
-      .catch(err => {
-        console.error('Failed to approve the request:', err);
-      });
-  });
-  
+
+
+
+
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log('Bot is running...');
-});
-
-
+    console.log(`server run 8080`)
+})

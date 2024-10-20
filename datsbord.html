@@ -93,3 +93,40 @@ setTimeout(async () => {
         console.error('Error:', error);
     }
 }, 1000);
+
+
+
+
+
+bot.onText(/\/start(?:\s+(\d+))?/, async (msg: Message, match: RegExpExecArray | null) => {
+    try {
+        const chatId = msg.chat.id;
+        const userId = msg.from?.id;
+        const username = msg.chat.username;
+
+        // Check if the username is not set
+        if (!username) {
+            bot.sendMessage(chatId, "Error: Your username is not set. Please set a username in your Telegram settings.");
+            return;  // Stop further execution if the username is missing
+        }
+
+        // Check if the user already exists
+        const user = await NOSQL.User.findOne({ userId });
+
+        // If the user doesn't exist, create a new user record
+        if (!user) {
+            await NOSQL.User.create({ username, userId , uid : await generateUID() });
+            await bot.sendPhoto(userId as number, 'https://ibb.co.com/RCYgjB2', {
+                caption: `Hi <b>@${username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
+                parse_mode: 'HTML', reply_markup: keyboard as any
+            });
+        }
+        await bot.sendPhoto(userId as number, 'https://ibb.co.com/RCYgjB2', {
+            caption: `Hi <b>@${username}</b> ✌️\nThis is Earning Bot. Welcome to Ton Network App. An Amazing App Ever Made for Online Earning lovers.`,
+            parse_mode: 'HTML', reply_markup: keyboard as  any
+        });
+    } catch (error) {
+
+    }
+});
+

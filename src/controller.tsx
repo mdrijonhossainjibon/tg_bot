@@ -138,6 +138,7 @@ const inlineKeyboard: InlineKeyboardMarkup = {
 export async function sendWelcomeMessage(user: any) {
     const welcomeMessage = `Welcome, ${user.username}! 🎉\n\nThank you for creating an account. We're excited to have you on board! Enjoy your welcome bonus of 0.07 USDT and start exploring our services. 😊`;
     user.bonus = (user.bonus || 0) + 0.07;
+    user.newUser =  true;
     await user.save();
     await bot.sendMessage(user.userId, welcomeMessage);
  
