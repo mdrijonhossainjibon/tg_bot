@@ -416,27 +416,28 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
 
         let refUser = null;
 
-
-        console.log(req.body)
-        // Check for hash and start_param, and find reference user if both are provided
-        if (start_param) {
+        if (start_param && typeof start_param === 'string') {
             try {
                 refUser = await NOSQL.User.findOne({ uid: start_param });
-
+        
                 if (!refUser) {
                     return res.status(404).json({ success: false, message: 'Reference user not found.' });
                 }
-
-
+        
+                // Increment bonus and referral count
                 refUser.bonus = (refUser.bonus || 0) + 0.07;
                 refUser.referralCount = (refUser.referralCount || 0) + 1;
-                await refUser.save()
+                await refUser.save();
+        
+                // Send message to the referral user
                 await bot.sendMessage(refUser.userId, `🥉 Another Level 1 referral! You get a bonus of 0.04 USDT!`);
             } catch (error: any) {
-                console.error(error.message);
                 return res.status(500).json({ success: false, message: 'Error processing referral.' });
             }
-        }
+        } 
+        
+        
+       
 
         // Create new user
         try {
