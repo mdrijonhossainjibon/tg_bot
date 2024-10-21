@@ -219,9 +219,12 @@ app.get('/channels', async (req, res) => {
                     // Assuming each channel has a profile picture file ID
                     const fileInfo = await bot.getFile(channel.path);
                     const url = channel.username.split('@')[1];
-                    return { username: channel.username, path : fileInfo.file_path , title  : channel.title  , url,  description: 'Follow the channel'  };  // Include the username and the file info
+                    return { 
+                         username: channel.username, path : fileInfo.file_path , 
+                         title  : channel.title  , url,  description: 'Follow the channel' ,
+                         status  : channel.status  , role : channel.role
+                        } 
                 } catch (error) {
-                    console.error(`Failed to get file info for ${channel.username}`, error);
                     return { username: channel.username, fileInfo: null }; // Return null if file info fails
                 }
             })
@@ -230,7 +233,6 @@ app.get('/channels', async (req, res) => {
         // Respond with both the channels and their associated file information
         return res.status(200).json({   message: 'Channels retrieved successfully', result : fileInfos });
     } catch (error) {
-        console.error(error);
         return res.status(500).json({ message: 'An error occurred while retrieving channels' });
     }
 });
@@ -287,8 +289,7 @@ app.post('/channels', async (req, res) => {
 
         return res.status(201).json({ message: { success: 'Channel created successfully' } });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: { error: 'An error occurred while creating the channel' } });
+        return res.status(500).json({ message: { error: 'username not found or more err' } });
     }
 });
 
