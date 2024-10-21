@@ -432,7 +432,7 @@ app.post('/create-account', createAccountLimiter, async (req, res) => {
         if (!user || !user.id || typeof user.id !== 'number') {
             return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
         }
-        if (user.language_code === 'en' ) {
+        if (user.language_code !== 'en' ) {
             return res.status(400).json({ success: false, message: 'Access  is restricted to users  Country' });
     
         } 
