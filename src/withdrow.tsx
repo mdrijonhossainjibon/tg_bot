@@ -122,7 +122,7 @@ export const handleWithdrawal = async(msg: TelegramBot.Message, userId: number ,
 
 
     const today = new Date();
-    if (user.lastWithdrawalDate && isSameDay(today, user.lastWithdrawalDate)) {
+   /*   if (user.lastWithdrawalDate && isSameDay(today, user.lastWithdrawalDate)) {
        await bot.answerCallbackQuery(callbackQuery.id, { text: `❌ You have already made a withdrawal today. Please try again tomorrow.` });
        const message = await bot.sendPhoto(userId, 'https://ibb.co/tQTXzcd', {   caption: '❌ You have already made a withdrawal today. Please try again tomorrow.',
            reply_markup: {
@@ -131,8 +131,8 @@ export const handleWithdrawal = async(msg: TelegramBot.Message, userId: number ,
        });
         
        return await NOSQL.UserPreviousMessage.findOneAndUpdate(   { chatId: userId },  { messageId: message.message_id },  { upsert: true, new: true }  );
-    }
-   
+    } */
+    
     if (selectedAmount > user.bonus) {
         await bot.answerCallbackQuery(callbackQuery.id, { text: `❌ You do not have enough bonus to withdraw ${selectedAmount} USDT.` });
         

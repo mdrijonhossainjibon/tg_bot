@@ -278,10 +278,12 @@ app.post('/channels', async (req, res) => {
             return res.status(409).json({ message: { error: 'Channel with the same username already exists' } });
         }
 
-        const channelurl = `https://t.me/${username.slice(1)}`; // Remove "@" from the username to create the URL
-
+      
+        const chatInfo = await bot.getChat(username);
+        const path  = chatInfo.photo ? chatInfo.photo.big_file_id : null;
+        const title = chatInfo.title
         // Create a new channel if it doesn't exist
-        await NOSQL.Channel.create({ username, channelurl });
+        await NOSQL.Channel.create({ username, path , title });
 
         return res.status(201).json({ message: { success: 'Channel created successfully' } });
     } catch (error) {
