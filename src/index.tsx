@@ -2,14 +2,15 @@ import { Message } from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import * as path from 'path';
 import { IConfig, NOSQL } from 'models';
-
+import jwt from 'jsonwebtoken';
+import { randomBytes } from "crypto";
 import mongoose from 'mongoose';
 
 import { API_CALL } from 'API_CALL';
 
 dotenv.config();
 import rateLimit from 'express-rate-limit';
-import express from 'express';
+import express, { NextFunction } from 'express';
 import compression from 'compression';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -19,7 +20,7 @@ import 'withdrow';
 import { generateUID, getConfig, isUserInChannel, keyboard } from 'lib';
 import './callback_query';
 import { sendWelcomeMessage } from 'controller';
-
+import { sendJSONResponse } from 'responseHandler';
 
 
 const userPreviousMessages: any = {};
@@ -54,6 +55,9 @@ const createAccountLimiter = rateLimit({
 });
 
 
+interface JwtPayload {
+    [key: string]: any;
+}
 
 
 
@@ -570,15 +574,70 @@ app.post('/ck_channel', async (req, res) => {
 });
 
 
-app.get('*', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Welcome to API service',
-        apiProvider: 'Md Rijonhossain Jibon',
-        contact: '/contact'  // Replace with your actual Telegram link
-    });
-});
+ app.post('/identity/sessions', async (req , rep ,next : NextFunction) =>{
+    try {
+        const { email, password  } = req.body;
 
+        if (!email) {
+            return rep.status(400).json({   "api-version": "1.0",   statusCode: 400, message: { error: 'identity.login.email_empty' }  });
+        }
+
+        if (!password) {
+            return rep.status(400).json({  "api-version": "1.0",  statusCode: 400, message: { error: 'identity.login.password_empty' } });
+        }
+        
+        if (typeof email !== 'string' || typeof password !== 'string') {
+            return rep.status(400).send({ message: { error: 'page.body.profile.content.action.typeof.miss' } });
+        }
+
+        const user = await NOSQL.User.findOne({ username : email });
+        if (!user) {
+            return rep.status(403).json({  "api-version": "1.0",  statusCode: 403,   message: { error: 'identity.identity.user_doesnt_exist' }  });
+        }
+
+        
+
+        if (password !== user.username) {
+            return rep.status(401).json({ "api-version": "1.0", statusCode: 401,  message: { error: 'identity.user.passwords_doesnt_match' } });
+        }
+
+        if (user.status === 'active') {
+            if (user.role === 'admin') {
+                const data = { uid  : user.uid , username : user.username , role : user.role,  createdAt  :  user.createdAt }
+                const token = jwt.sign({ user: data }, process.env.JWT_SECRET || 'default-secret', { expiresIn: '24h' });
+                const result = { ...data,   csrf_token: token };
+
+                return sendJSONResponse({ res: rep, message: { success: 'login successful' }, result: { user: result } })
+            }
+            return rep.status(403).json({  "api-version": "1.0",   statusCode: 403,  message: { error: 'page.header.admin.permissions.error' } });
+        }
+        return rep.status(403).json({ "api-version": "1.0",  statusCode: 403,  message: { error: `identity.session.${user.status}` } });
+ 
+    } catch (error) {
+        next(error)
+    }
+ })
+
+
+ app.post('/identity/sessions/verify', async (req , res ,next : NextFunction) =>{
+    try {
+        const authHeader: any = req.headers['x-csrf-token'];
+        if (!authHeader) {
+            return sendJSONResponse({ res , statusCode : 400 , message : { error : 'CSRF token is missing' } })    
+        }
+
+        const data: JwtPayload = jwt.verify(authHeader, process.env.JWT_SECRET || 'default-secret') as { [key: string]: any };
+
+        const result = { user: data.user, phones: {}, profiles: {} };
+        return sendJSONResponse({ res ,  message : { success : 'page.header.signUp.message.success' } , result  })    
+         
+    } catch (error : any) {
+        if(error.message === 'jwt expired'){
+            return res.json({ "api-version": "2.0", statusCode: 200, message: { error: 'page.header.signUp.message.error' }  });
+        }
+        return next(error)
+    }
+ })
 
 
 
